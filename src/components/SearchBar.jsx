@@ -1,50 +1,99 @@
-import { useState, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { BookContext } from '../context/BookContext';
 
+export default function SearchBar() {
+  // Initialize query state for the search input
+  const [query, setQuery] = useState('');
+  // Initialize books and loading/error states
+  const [books, setBooks] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-const SearchBar = () => {
-  // initialize the query state to an empty string, controlled state for the search input
-  const [query, setQuery] = useState(''); 
-  // retrieves the dispatch function from the BookContext.
-  const{ dispatch } = useContext(BookContext);
+  // Retrieve dispatch from context
+  const { dispatch } = useContext(BookContext);
 
-  //handleSearch function
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if(!query) return;
-
-   //dispatching the set_loading action 
-    dispatch({type: 'SET_LOADING'});
-
-    // fetching Books for the API
+  // Function to fetch books from API
+  const getBooks = async () => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY; // Ensure you have the correct API key
-      const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}&key=${apiKey}`); // Use apiKey in the fetch URL
-      const data = await response.json();
+      // Use environment variable for API key
+      const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY; 
+      const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=SEARCH_TERM&key=${apiKey}`)
+      .then(response => response.json())
+      .then(data => console.log(data));
+    
       
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+      const data = await response.json();
+
       if (data.items) {
+        setBooks(data.items);
         dispatch({ type: 'SET_BOOKS', payload: data.items });
       } else {
+        setError('No books found.');
         dispatch({ type: 'SET_ERROR', payload: 'No books found.' });
       }
-    } catch (error) {
-      console.error('Error fetching books:', error);
-      dispatch({ type: 'SET_ERROR', payload: 'Failed to fetch books.' });
+    } catch (err) {
+      console.error('Error fetching books:', err.message);
+      setError(`Failed to fetch books: ${err.message}`);
+      dispatch({ type: 'SET_ERROR', payload: `Failed to fetch books: ${err.message}` });
+    } finally {
+      setLoading(false);
     }
-};
+  };
+
+  // useEffect to trigger fetch when query is updated
+  useEffect(() => {
+    if (query) {
+      getBooks();
+    }
+  }, [query]);
+
+  // Handling search form submit
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (query) getBooks();
+  };
+
+  // Loaded function for when books are available
+  const loaded = () => {
+    return books ? (
+      <div>
+        <h2>Search Results:</h2>
+        <ul>
+          {books.map(book => (
+            <li key={book.id}>{book.volumeInfo.title}</li>
+          ))}
+        </ul>
+      </div>
+    ) : null;
+  };
+
+  // Display while loading
+  const loadingMessage = () => <h2>Loading...</h2>;
+
+  // Return the component structure
   return (
-    <form onSubmit={handleSearch} style={styles.form}>
-      <input
-        type="text"
-        placeholder="Search for books..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        style={styles.input}
-      />
-      <button type="submit" style={styles.button}>Search</button>
-    </form>
+    <div>
+      <form onSubmit={handleSearch} style={styles.form}>
+        <input
+          type="text"
+          placeholder="Search for books..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          style={styles.input}
+        />
+        <button type="submit" style={styles.button}>Search</button>
+      </form>
+      
+      {/* Conditionally render content based on loading or error state */}
+      {loading ? loadingMessage() : error ? <h2>{error}</h2> : loaded()}
+    </div>
   );
-};
+}
 
 const styles = {
   form: {
@@ -64,5 +113,3 @@ const styles = {
     cursor: 'pointer',
   },
 };
-
-export default SearchBar;
