@@ -1,9 +1,33 @@
-# React + Vite
+# Book Finder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React application that allows users to search for books using the Google Books API.
 
-Currently, two official plugins are available:
+## Technologies Used
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-# SBA320H_react_bookfinder
+- React
+- Vite
+- JavaScript (ES6+)
+- CSS
+- Google Books API
+
+## Live Site
+
+[Book Finder Live](https://gbookfinder.netlify.app/)
+
+## Usage
+
+1. Enter a book title or keyword in the search bar.
+2. Click on the "Search" button.
+3. Browse through the list of books matching your query.
+4. Click "More Info" to view additional details on Google Books.
+
+## Unsolved Problems
+
+- Pagination for search results.
+- Improved error handling for specific error cases.
+- Enhanced mobile responsiveness.
+
+## Future Enhancements
+
+- Add user authentication to save favorite books.
+- Implement sorting and filtering options.
