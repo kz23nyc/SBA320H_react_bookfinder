@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import { BookContext } from '../context/BookContext';
 
 export default function SearchBar() {
@@ -14,16 +14,14 @@ export default function SearchBar() {
 
   // Function to fetch books from API
   const getBooks = async () => {
+    if (!query) return; // Prevent fetching if query is empty
     setLoading(true);
     setError(null);
     
     try {
       // Use environment variable for API key
       const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY; 
-      const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=SEARCH_TERM&key=${apiKey}`)
-      .then(response => response.json())
-      .then(data => console.log(data));
-    
+      const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}&key=${apiKey}`);
       
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
@@ -45,17 +43,10 @@ export default function SearchBar() {
     }
   };
 
-  // useEffect to trigger fetch when query is updated
-  useEffect(() => {
-    if (query) {
-      getBooks();
-    }
-  }, [query]);
-
   // Handling search form submit
   const handleSearch = (e) => {
     e.preventDefault();
-    if (query) getBooks();
+    if (query) getBooks(); // Fetch only when a query exists
   };
 
   // Loaded function for when books are available
