@@ -12,7 +12,9 @@ A React application that allows users to search for books using the Google Books
 
 ## Live Site
 
-[Book Finder Live](https://gbookfinder.netlify.app/)
+[Book Finder Live]
+https://bookfinder-gbooks.netlify.app/
+
 
 ## Usage
 
